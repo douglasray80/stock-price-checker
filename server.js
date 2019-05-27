@@ -13,7 +13,14 @@ const runner = require('./test-runner');
 
 const app = express();
 
-app.use(helmet());
+app.use(
+	helmet.contentSecurityPolicy({
+		directives: {
+			defaultSrc: ["'self'"],
+			styleSrc: ["'self'"]
+		}
+	})
+);
 
 app.use(morgan('dev'));
 
