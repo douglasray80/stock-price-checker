@@ -34,20 +34,25 @@ suite('Functional Tests', function() {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', like: true })
+				.query({ stock: 'goog', like: 'true' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
+					assert.equal(res.type, 'application/json');
+					assert.property(res.body.stockData, 'stock');
+					assert.isNumber(res.body.stockData.price, 'price is a number');
+					assert.isNumber(res.body.stockData.likes, 'likes is a number');
 					done();
 				});
 		});
 
-		test('1 stock with like again (ensure likes arent double counted)', function(done) {
+		test('1 stock with like again (ensure likes are not double counted)', function(done) {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', like: true })
+				.query({ stock: 'goog', like: 'true' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
+					assert.equal(res.body.stockData.likes, 1);
 					done();
 				});
 		});
@@ -56,9 +61,11 @@ suite('Functional Tests', function() {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', stock: 'amd' })
+				.query({ stock: 'aapl', stock: 'msft' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
+					assert.equal(res.type, 'application/json');
+					// assert.isArray(res.body.stockData, 'stock data is an array');
 					done();
 				});
 		});
@@ -67,9 +74,10 @@ suite('Functional Tests', function() {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', stock: 'amd', like: true })
+				.query({ stock: 'aapl', stock: 'msft', like: 'true' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
+					// assert.property(res.body.stockData[0], 'rel_likes');
 					done();
 				});
 		});

@@ -69,7 +69,7 @@ app.listen(process.env.PORT || 3000, function() {
 				console.log('Tests are not valid:');
 				console.log(error);
 			}
-		}, 3500);
+		}, 4000);
 	} else {
 		app.use(morgan('dev'));
 	}

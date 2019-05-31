@@ -27,18 +27,20 @@ module.exports = function(app) {
 					response.push({
 						stock: stock.symbol,
 						price: stock.price,
-						likes: stock.likes.length
+						rel_likes: stock.likes.length
 					});
 				}
 
-				const difference = Math.abs(response[0].likes - response[1].likes);
+				const difference = Math.abs(
+					response[0].rel_likes - response[1].rel_likes
+				);
 
-				if (response[0].likes > response[1].likes) {
-					response[0].likes = difference;
-					response[1].likes = -difference;
+				if (response[0].rel_likes > response[1].rel_likes) {
+					response[0].rel_likes = difference;
+					response[1].rel_likes = -difference;
 				} else {
-					response[0].likes = -difference;
-					response[1].likes = difference;
+					response[0].rel_likes = -difference;
+					response[1].rel_likes = difference;
 				}
 
 				res.json({ stockData: response });
