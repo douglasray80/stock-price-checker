@@ -13,5 +13,7 @@ module.exports = function(app) {
 		const stock = req.query.stock;
 		const like = req.query.like;
 		const ipAddress = req.ip;
+
+		res.json({ stockData: { stock: '', price: '', likes: '' } });
 	});
 };
