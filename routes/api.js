@@ -16,17 +16,37 @@ module.exports = function(app) {
 		const user_ip = req.ip;
 
 		try {
-			let stock = await StockService.getStock(stock_symbol);
+			if (Array.isArray(stock_symbol)) {
+				const stocks = await stock_symbol.reduce(async (newArr, symbol) => {
+					let stock = await StockService.getStock(symbol);
 
-			if (like) stock = await StockService.likeStock(stock._id, user_ip);
+					if (like) stock = await StockService.likeStock(stock._id, user_ip);
 
-			res.json({
-				stockData: {
-					stock: stock.symbol,
-					price: stock.price,
-					likes: stock.likes.length
-				}
-			});
+					const arr = await newArr;
+
+					arr.push({
+						stock: stock.symbol,
+						price: stock.price,
+						likes: stock.likes.length
+					});
+
+					return arr;
+				}, []);
+
+				res.json({ stockData: stocks });
+			} else {
+				let stock = await StockService.getStock(stock_symbol);
+
+				if (like) stock = await StockService.likeStock(stock._id, user_ip);
+
+				res.json({
+					stockData: {
+						stock: stock.symbol,
+						price: stock.price,
+						likes: stock.likes.length
+					}
+				});
+			}
 		} catch (err) {
 			next(err);
 		}
