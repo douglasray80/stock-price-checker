@@ -17,23 +17,31 @@ module.exports = function(app) {
 
 		try {
 			if (Array.isArray(stock_symbol)) {
-				const stocks = await stock_symbol.reduce(async (newArr, symbol) => {
-					let stock = await StockService.getStock(symbol);
+				const response = [];
+
+				for (let i = 0; i < stock_symbol.length; i++) {
+					let stock = await StockService.getStock(stock_symbol[i]);
 
 					if (like) stock = await StockService.likeStock(stock._id, user_ip);
 
-					const arr = await newArr;
-
-					arr.push({
+					response.push({
 						stock: stock.symbol,
 						price: stock.price,
 						likes: stock.likes.length
 					});
+				}
 
-					return arr;
-				}, []);
+				const difference = Math.abs(response[0].likes - response[1].likes);
 
-				res.json({ stockData: stocks });
+				if (response[0].likes > response[1].likes) {
+					response[0].likes = difference;
+					response[1].likes = -difference;
+				} else {
+					response[0].likes = -difference;
+					response[1].likes = difference;
+				}
+
+				res.json({ stockData: response });
 			} else {
 				let stock = await StockService.getStock(stock_symbol);
 
