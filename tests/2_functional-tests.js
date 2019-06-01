@@ -13,13 +13,15 @@ const server = require('../server');
 
 chai.use(chaiHttp);
 
+// WARNING: external api rate limited at 5 calls per minute,
+// Thus, these tests will only pass once per minute!
 suite('Functional Tests', function() {
 	suite('GET /api/stock-prices => stockData object', function() {
 		test('1 stock', function(done) {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog' })
+				.query({ stock: 'msft' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
 					assert.property(res.body, 'stockData');
@@ -34,7 +36,7 @@ suite('Functional Tests', function() {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', like: 'true' })
+				.query({ stock: 'msft', like: 'true' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
 					assert.equal(res.type, 'application/json');
@@ -49,7 +51,7 @@ suite('Functional Tests', function() {
 			chai
 				.request(server)
 				.get('/api/stock-prices')
-				.query({ stock: 'goog', like: 'true' })
+				.query({ stock: 'msft', like: 'true' })
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
 					assert.equal(res.body.stockData.likes, 1);
@@ -60,12 +62,13 @@ suite('Functional Tests', function() {
 		test('2 stocks', function(done) {
 			chai
 				.request(server)
-				.get('/api/stock-prices')
-				.query({ stock: 'aapl', stock: 'msft' })
+				.get('/api/stock-prices?stock=msft&stock=aapl')
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
 					assert.equal(res.type, 'application/json');
-					// assert.isArray(res.body.stockData, 'stock data is an array');
+					console.log(res.body);
+					assert.property(res.body.stockData[0], 'rel_likes');
+					assert.property(res.body.stockData[1], 'rel_likes');
 					done();
 				});
 		});
@@ -73,11 +76,12 @@ suite('Functional Tests', function() {
 		test('2 stocks with like', function(done) {
 			chai
 				.request(server)
-				.get('/api/stock-prices')
-				.query({ stock: 'aapl', stock: 'msft', like: 'true' })
+				.get('/api/stock-prices?stock=msft&stock=aapl&like=true')
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
+					assert.equal(res.type, 'application/json');
 					// assert.property(res.body.stockData[0], 'rel_likes');
+					// assert.property(res.body.stockData[1], 'rel_likes');
 					done();
 				});
 		});
