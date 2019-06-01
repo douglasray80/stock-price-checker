@@ -59,6 +59,21 @@ suite('Functional Tests', function() {
 				});
 		});
 
+		// These last two have to be switched around to pass,
+		// because of external api rate limiting...
+		test('2 stocks with like', function(done) {
+			chai
+				.request(server)
+				.get('/api/stock-prices?stock=aapl&stock=msft&like=true')
+				.end(function(err, res) {
+					assert.equal(res.status, 200);
+					assert.equal(res.type, 'application/json');
+					assert.property(res.body.stockData[0], 'rel_likes');
+					assert.property(res.body.stockData[1], 'rel_likes');
+					done();
+				});
+		});
+
 		test('2 stocks', function(done) {
 			chai
 				.request(server)
@@ -66,22 +81,8 @@ suite('Functional Tests', function() {
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
 					assert.equal(res.type, 'application/json');
-					console.log(res.body);
 					assert.property(res.body.stockData[0], 'rel_likes');
 					assert.property(res.body.stockData[1], 'rel_likes');
-					done();
-				});
-		});
-
-		test('2 stocks with like', function(done) {
-			chai
-				.request(server)
-				.get('/api/stock-prices?stock=msft&stock=aapl&like=true')
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.equal(res.type, 'application/json');
-					// assert.property(res.body.stockData[0], 'rel_likes');
-					// assert.property(res.body.stockData[1], 'rel_likes');
 					done();
 				});
 		});
